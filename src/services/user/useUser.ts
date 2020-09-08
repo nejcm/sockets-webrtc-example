@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 export interface User {
   id: string;
-  name?: string;
+  name: string;
   avatar?: string;
 }
 

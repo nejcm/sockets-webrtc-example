@@ -11,7 +11,6 @@ const Room: React.FC = () => {
   const { user } = useUser();
 
   useEffect(() => {
-    console.log(socket);
     socket?.emit('new-user', user);
   }, [user, socket]);
 

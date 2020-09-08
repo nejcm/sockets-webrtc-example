@@ -1,11 +1,11 @@
 import { Box, Text } from '@chakra-ui/core';
 import React from 'react';
 import theme from '../../../../../../config/theme';
-import { Message } from '../../../../../../services/messages/useMessages';
+import { SocketMessage } from '../../../../../../services/socket/useSocket';
 import { Bubble, MessageType } from './styles';
 
 interface MessageProps {
-  message: Message;
+  message: SocketMessage;
   i: number;
   currentUserId: string;
 }

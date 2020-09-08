@@ -7,7 +7,14 @@ import React, {
 } from 'react';
 import socketIOClient from 'socket.io-client';
 import { settings } from '../../config';
+import { User } from '../user/useUser';
 const ENDPOINT = `${settings.host}:${settings.port}`;
+
+export interface SocketMessage {
+  user?: User;
+  message: string;
+  [key: string]: unknown;
+}
 
 export interface ContextValue {
   socket: SocketIOClient.Socket | undefined;
