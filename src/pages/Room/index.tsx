@@ -4,13 +4,11 @@ import { Redirect } from 'react-router-dom';
 import socketIOClient from 'socket.io-client';
 import { settings } from '../../config';
 import { useUser } from '../../services/user/useUser';
-import Messages from './components/Messages';
-import Video from './components/Video';
+import Chat from './components/Chat';
+import Video from './components/Streams';
 const ENDPOINT = `${settings.host}:${settings.port}`;
 
-interface RoomProps {}
-
-const Room: React.FC<RoomProps> = () => {
+const Room: React.FC = () => {
   const [socket, setSocket] = useState<SocketIOClient.Socket>();
   const { user } = useUser();
 
@@ -32,7 +30,7 @@ const Room: React.FC<RoomProps> = () => {
         <Box m="auto" width="100%" minHeight="100vh">
           <Flex direction="row" width="100%">
             <Video socket={socket} user={user!} pr="300px" />
-            <Messages socket={socket} user={user!} />
+            <Chat socket={socket} user={user!} />
           </Flex>
         </Box>
       ) : (

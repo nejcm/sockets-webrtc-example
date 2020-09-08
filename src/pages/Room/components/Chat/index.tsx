@@ -6,12 +6,12 @@ import Form from './components/Form';
 import Message from './components/Message';
 import { Wrapper } from './styles';
 
-interface MessagesProps extends BoxProps {
+interface ChatProps extends BoxProps {
   user: User;
   socket: SocketIOClient.Socket;
 }
 
-const Messages: React.FC<MessagesProps> = ({ user, socket, ...rest }) => {
+const Chat: React.FC<ChatProps> = ({ user, socket, ...rest }) => {
   const { usersCount, messages, send } = useMessages(socket);
 
   const onSubmit = useCallback(
@@ -29,7 +29,7 @@ const Messages: React.FC<MessagesProps> = ({ user, socket, ...rest }) => {
     <Wrapper {...rest}>
       <Flex direction="column" height="100%">
         <Flex justifyContent="space-between">
-          <Heading size="md">Messages</Heading>
+          <Heading size="md">Chat</Heading>
           <div>({usersCount})</div>
         </Flex>
         <Box width="100%" mt="auto">
@@ -53,4 +53,4 @@ const Messages: React.FC<MessagesProps> = ({ user, socket, ...rest }) => {
     </Wrapper>
   );
 };
-export default Messages;
+export default Chat;
