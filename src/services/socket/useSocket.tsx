@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import socketIOClient from 'socket.io-client';
 import { settings } from '../../config';
 const ENDPOINT = `${settings.host}:${settings.port}`;
@@ -21,21 +27,19 @@ export interface SocketProviderProps {
 }
 
 const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
-  const [socket, setSocket] = useState<SocketIOClient.Socket>();
+  const [socket, setSocket] = useState<SocketIOClient.Socket | undefined>();
 
   useEffect(() => {
     const client = socketIOClient(ENDPOINT);
     setSocket(client);
     return () => {
-      console.log('Disconnecting client...');
-      client?.disconnect();
+      client.disconnect();
     };
   }, []);
 
+  const value = useMemo(() => ({ socket }), [socket]);
   return (
-    <SocketContext.Provider value={{ socket }}>
-      {children}
-    </SocketContext.Provider>
+    <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
   );
 };
 

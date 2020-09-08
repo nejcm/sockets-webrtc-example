@@ -1,27 +1,19 @@
 import { Box, Flex } from '@chakra-ui/core';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
-import socketIOClient from 'socket.io-client';
-import { settings } from '../../config';
+import { SocketProvider, useSocket } from '../../services/socket/useSocket';
 import { useUser } from '../../services/user/useUser';
 import Chat from './components/Chat';
 import Video from './components/Streams';
-const ENDPOINT = `${settings.host}:${settings.port}`;
 
 const Room: React.FC = () => {
-  const [socket, setSocket] = useState<SocketIOClient.Socket>();
+  const { socket } = useSocket();
   const { user } = useUser();
 
-  // TODO: Put this into socket provider (react context)
   useEffect(() => {
-    const client = socketIOClient(ENDPOINT);
-    setSocket(client);
-    client.emit('new-user', user);
-    return () => {
-      console.log('Disconnecting client...');
-      client.disconnect();
-    };
-  }, [user]);
+    console.log(socket);
+    socket?.emit('new-user', user);
+  }, [user, socket]);
 
   return (
     <>
@@ -40,4 +32,9 @@ const Room: React.FC = () => {
   );
 };
 
-export default Room;
+const RoomProvider: React.FC = () => (
+  <SocketProvider>
+    <Room />
+  </SocketProvider>
+);
+export default RoomProvider;
