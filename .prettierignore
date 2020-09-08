@@ -1,0 +1,10 @@
+node_modules/
+coverage/
+dist/
+build/
+.docz/
+docs/
+package-lock.json
+yarn.lock
+package.json
+.next/

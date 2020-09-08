@@ -1,0 +1,13 @@
+{
+  "extends": "@nejcm/configs/src/tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react"
+  },
+  "include": ["src"],
+  "exclude": ["dist", "build"]
+}
