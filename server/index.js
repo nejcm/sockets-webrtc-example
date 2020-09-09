@@ -8,17 +8,19 @@ const port = process.env.PORT || 3001;
 const users = {};
 
 const app = express();
+const server = http.Server(app);
+const io = socketIo(server);
+
 app.use(cors());
 
 const router = express.Router();
 router.get('/', (_req, res) => {
   res.send({ response: 'Hello!' }).status(200);
 });
-
 app.use(router);
 
 // error handler
-app.use((err, req, res, _next) => {
+app.use((err, req, res) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -26,9 +28,6 @@ app.use((err, req, res, _next) => {
   res.status(err.status || 500);
   res.render('error');
 });
-
-const server = http.createServer(app);
-const io = socketIo(server);
 
 io.on('connection', (socket) => {
   socket.on('new-user', (user) => {

@@ -8,7 +8,7 @@ import React, {
 import socketIOClient from 'socket.io-client';
 import { settings } from '../../config';
 import { User } from '../user/useUser';
-const ENDPOINT = `${settings.host}:${settings.port}`;
+const ENDPOINT = `${settings.server.host}:${settings.server.port}`;
 
 export interface SocketMessage {
   user?: User;

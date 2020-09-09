@@ -13,8 +13,9 @@ export interface useUserResponse {
 const KEY = 'user';
 
 export const useUser = (): useUserResponse => {
-  const current = JSON.parse(localStorage.getItem(KEY) || '');
-  const [user, setUserState] = useState<User | undefined>(current);
+  const [user, setUserState] = useState<User | undefined>(
+    JSON.parse(localStorage.getItem(KEY) || ''),
+  );
 
   const setUser = useCallback(
     (values: Partial<User>): void => {

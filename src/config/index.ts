@@ -1,6 +1,12 @@
 export const settings = {
-  host: 'http://localhost',
-  port: 3001,
+  server: {
+    host: 'http://localhost',
+    port: 3001,
+  },
+  peer: {
+    host: '/',
+    port: 3002,
+  },
   basename: '',
   userMedia: {
     settings: {

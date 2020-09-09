@@ -8,11 +8,10 @@ import { Wrapper } from './styles';
 
 interface ChatProps extends BoxProps {
   user: User;
-  socket: SocketIOClient.Socket;
 }
 
-const Chat: React.FC<ChatProps> = ({ user, socket, ...rest }) => {
-  const { usersCount, messages, send } = useMessages(socket);
+const Chat: React.FC<ChatProps> = ({ user, ...rest }) => {
+  const { usersCount, messages, send } = useMessages();
 
   const onSubmit = useCallback(
     (ev: React.SyntheticEvent<EventTarget>): void => {

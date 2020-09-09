@@ -9,15 +9,13 @@ import { Wrapper } from './styles';
 
 interface VideoProps extends BoxProps {
   user: User;
-  socket: SocketIOClient.Socket;
 }
 
-const Video: React.FC<VideoProps> = ({ user, socket, ...rest }) => {
+const Video: React.FC<VideoProps> = ({ user, ...rest }) => {
   const localStream = useUserMedia();
   const { remoteStreams } = useVideo({
     currentUserId: user.id,
     localStream,
-    socket,
   });
 
   return (

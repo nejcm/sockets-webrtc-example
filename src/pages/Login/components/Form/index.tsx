@@ -24,11 +24,11 @@ const LoginForm: React.FC<RoomLoginProps> = ({ onSubmit }) => {
       rounded="md"
       overflow="hidden"
     >
+      <Heading mt={6} mb={10} as="h2" textAlign="center">
+        Chat Room
+      </Heading>
       <form onSubmit={onSubmit}>
         <Stack spacing={6}>
-          <Heading mt={6} as="h2" textAlign="center">
-            Chat
-          </Heading>
           <FormControl as="fieldset">
             <FormLabel htmlFor="name">Name</FormLabel>
             <Input

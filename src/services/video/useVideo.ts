@@ -1,8 +1,13 @@
 import Peer from 'peerjs';
 import { useCallback, useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { settings } from '../../config';
-import { SocketMessage } from '../socket/useSocket';
+import { Actions } from '../socket/actions';
+import { SocketMessage, useSocket } from '../socket/useSocket';
+
+export interface RemoteStream {
+  id: string;
+  stream: MediaStream;
+}
 
 export interface UseVideoResponse {
   peer: Peer | undefined;
@@ -14,16 +19,11 @@ export interface UseVideoProps {
   socket?: SocketIOClient.Socket;
 }
 
-export interface RemoteStream {
-  id: string;
-  stream: MediaStream;
-}
-
 const useVideo = ({
   currentUserId,
   localStream,
-  socket,
 }: UseVideoProps): UseVideoResponse => {
+  const { socket } = useSocket();
   const [myPeer, setPeer] = useState<Peer>();
   const [remoteStreams, setRemoteStreams] = useState<RemoteStream[]>([]);
 
@@ -36,53 +36,17 @@ const useVideo = ({
   }, []);
 
   const removeRemoteStream = useCallback((id: string) => {
-    setRemoteStreams((remoteStreams) => {
-      const index = remoteStreams.findIndex((remote) => remote.id === id);
-      if (index < 0) return [...remoteStreams];
-      remoteStreams.splice(index, 1);
-      return [...remoteStreams];
+    setRemoteStreams((prev) => {
+      const index = prev.findIndex((remote) => remote.id === id);
+      if (index < 0) return [...prev];
+      prev.splice(index, 1);
+      return [...prev];
     });
   }, []);
 
+  console.count('counter');
+
   useEffect(() => {
-    const peer = myPeer
-      ? myPeer
-      : new Peer(uuidv4(), {
-          secure: false,
-          host: settings.host,
-          port: settings.port,
-        });
-
-       console.log(peer);
-
-    peer.on('open', (_id) => {
-      setPeer(peer);
-    });
-
-    peer.on('call', (call) => {
-      call.answer(localStream);
-      call.on('stream', (stream) => {
-        addRemoteStream({ stream, id: currentUserId as string });
-      });
-    });
-
-    socket?.on('user-connected', (data: SocketMessage) => {
-      if (!data?.user?.id || !localStream) return;
-      const id = data.user.id;
-      const call = peer.call(id, localStream);
-      call.on('stream', (stream) => {
-        addRemoteStream({ stream, id });
-      });
-      call.on('close', () => {
-        removeRemoteStream(id);
-      });
-    });
-
-    socket?.on('user-disconnected', (data: SocketMessage) => {
-      if (!data?.user?.id) return;
-      removeRemoteStream(data.user.id);
-    });
-
     const cleanUp = () => {
       if (myPeer) {
         myPeer.disconnect();
@@ -90,6 +54,25 @@ const useVideo = ({
       }
       setPeer(undefined);
     };
+
+    const peer = myPeer
+      ? myPeer
+      : new Peer(currentUserId, {
+          host: settings.peer.host,
+          port: settings.peer.port,
+        });
+
+    peer.on('open', () => {
+      setPeer(peer);
+    });
+
+    // answer call
+    peer.on('call', (call) => {
+      call.answer(localStream);
+      call.on('stream', (stream) => {
+        addRemoteStream({ stream, id: call.peer });
+      });
+    });
 
     peer.on('disconnected', () => {
       cleanUp();
@@ -107,14 +90,28 @@ const useVideo = ({
     return () => {
       cleanUp();
     };
-  }, [
-    addRemoteStream,
-    currentUserId,
-    localStream,
-    myPeer,
-    removeRemoteStream,
-    socket,
-  ]);
+  }, [addRemoteStream, currentUserId, localStream, myPeer]);
+
+  useEffect(() => {
+    if (!localStream || !socket || !myPeer) return;
+
+    socket?.on(Actions.USER_CONNECTED, (data: SocketMessage) => {
+      if (!data?.user?.id || !localStream) return;
+      const id = data.user.id;
+      const call = myPeer.call(id, localStream);
+      call.on('stream', (stream) => {
+        addRemoteStream({ stream, id });
+      });
+      call.on('close', () => {
+        removeRemoteStream(id);
+      });
+    });
+
+    socket?.on(Actions.USER_DISCONNECTED, (data: SocketMessage) => {
+      if (!data?.user?.id) return;
+      removeRemoteStream(data.user.id);
+    });
+  }, [socket, localStream, myPeer, addRemoteStream, removeRemoteStream]);
 
   return { peer: myPeer, remoteStreams };
 };

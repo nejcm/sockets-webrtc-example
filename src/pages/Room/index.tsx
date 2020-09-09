@@ -1,6 +1,7 @@
 import { Box, Flex } from '@chakra-ui/core';
 import React, { useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
+import { Actions } from '../../services/socket/actions';
 import { SocketProvider, useSocket } from '../../services/socket/useSocket';
 import { useUser } from '../../services/user/useUser';
 import Chat from './components/Chat';
@@ -11,17 +12,19 @@ const Room: React.FC = () => {
   const { user } = useUser();
 
   useEffect(() => {
-    socket?.emit('new-user', user);
+    socket?.emit(Actions.NEW_USER, user);
   }, [user, socket]);
 
+  if (!user || !user.id) {
+    return <Redirect to="/" />;
+  }
   return (
     <>
-      {user && user.id ? null : <Redirect to="/" />}
       {socket ? (
         <Box m="auto" width="100%" minHeight="100vh">
           <Flex direction="row" width="100%">
-            <Video socket={socket} user={user!} pr="300px" />
-            <Chat socket={socket} user={user!} />
+            <Video user={user} pr="300px" />
+            <Chat user={user} />
           </Flex>
         </Box>
       ) : (
