@@ -1,5 +1,5 @@
-import { Box, BoxProps } from '@chakra-ui/core';
-import React from 'react';
+import { Box, BoxProps, useToast } from '@chakra-ui/core';
+import React, { useEffect } from 'react';
 import LocalStream from '../../../../components/Streams/Local';
 import RemoteStreams from '../../../../components/Streams/Remote';
 import { User } from '../../../../services/user/useUser';
@@ -13,10 +13,22 @@ interface VideoProps extends BoxProps {
 
 const Video: React.FC<VideoProps> = ({ user, ...rest }) => {
   const localStream = useUserMedia();
-  const { remoteStreams } = useVideo({
+  const { remoteStreams, error } = useVideo({
     currentUserId: user.id,
     localStream,
   });
+  const toast = useToast();
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: 'An error occurred.',
+        description: error.message,
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  }, [error, toast]);
 
   return (
     <Box width="100%" alignSelf="center" px={3} {...rest}>

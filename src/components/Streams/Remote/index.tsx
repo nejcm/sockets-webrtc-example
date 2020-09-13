@@ -2,7 +2,7 @@ import { AspectRatioBox, Box, BoxProps } from '@chakra-ui/core';
 import React, { useEffect, useRef } from 'react';
 import theme from '../../../config/theme';
 import { RemoteStream } from '../../../services/video/useVideo';
-import { Video } from './styles';
+import { Name, Overlay, Video } from './styles';
 
 interface RemoteStreamsProps extends BoxProps {
   remoteStreams: RemoteStream[];
@@ -36,6 +36,11 @@ const RemoteStreams: React.FC<RemoteStreamsProps> = ({
               autoPlay
               playsInline
             />
+            {dataStream.name ? (
+              <Overlay>
+                <Name>{dataStream.name}</Name>
+              </Overlay>
+            ) : null}
           </Box>
         </AspectRatioBox>
       ))}

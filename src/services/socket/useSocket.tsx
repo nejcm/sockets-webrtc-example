@@ -11,6 +11,8 @@ import { User } from '../user/useUser';
 const ENDPOINT = `${settings.server.host}:${settings.server.port}`;
 
 export interface SocketMessage {
+  id?: string;
+  peerId?: string;
   user?: User;
   message: string;
   [key: string]: unknown;

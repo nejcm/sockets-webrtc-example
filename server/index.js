@@ -6,6 +6,7 @@ const socketIo = require('socket.io');
 
 const port = process.env.PORT || 3001;
 const users = {};
+const peers = {};
 
 const app = express();
 const server = http.Server(app);
@@ -34,25 +35,43 @@ io.on('connection', (socket) => {
     users[socket.id] = user;
     // socket.join(roomId);
     // socket.to(roomId).broadcast.emit('user-connected', userId);
-    socket.broadcast.emit('user-connected', {
+    const data = {
+      user,
       message: `User ${user.name || ''} connected.`,
       count: users.length,
-    });
+    };
+    socket.broadcast.emit('user-connected', data);
+  });
+
+  socket.on('new-user-video', ({ id }) => {
+    peers[socket.id] = id;
+    const user = users[socket.id];
+    const data = {
+      peerId: id,
+      message: `User ${user.name || ''} video connected.`,
+      user,
+    };
+    socket.broadcast.emit('user-video-connected', data);
   });
 
   socket.on('send-message', (message) => {
-    socket.broadcast.emit('new-message', {
-      user: users[socket.id],
+    const user = users[socket.id];
+    const data = {
+      user,
       message,
-    });
+    };
+    socket.broadcast.emit('new-message', data);
   });
 
   socket.on('disconnect', () => {
     const user = users[socket.id] || {};
-    socket.broadcast.emit('user-disconnected', {
+    const peerId = peers[socket.id];
+    const data = {
+      user,
+      peerId,
       message: `User ${user.name || ''} disconnected.`,
-      count: users.length,
-    });
+    };
+    socket.broadcast.emit('user-disconnected', data);
     delete users[socket.id];
   });
 });

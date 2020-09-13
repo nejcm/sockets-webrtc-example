@@ -3,15 +3,20 @@ import { Actions } from '../socket/actions';
 import { SocketMessage, useSocket } from '../socket/useSocket';
 import { User } from '../user/useUser';
 
+export interface Message {
+  from?: User;
+  message: string;
+}
+
 export interface UseUserResponse {
   usersCount: number;
-  messages: SocketMessage[];
+  messages: Message[];
   send: (message: string, user: User) => void;
 }
 
 export const useMessages = (): UseUserResponse => {
   const { socket } = useSocket();
-  const [messages, setMessages] = useState<SocketMessage[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [usersCount] = useState<number>(1);
 
   const send = useCallback(
@@ -20,7 +25,7 @@ export const useMessages = (): UseUserResponse => {
       setMessages((prev) => [
         ...prev,
         {
-          user,
+          from: user,
           message,
         },
       ]);
@@ -29,16 +34,19 @@ export const useMessages = (): UseUserResponse => {
   );
 
   useEffect(() => {
-    socket?.on(Actions.NEW_MESSAGE, (data: SocketMessage) => {
-      setMessages((prev) => [...prev, data]);
+    socket?.on(Actions.NEW_MESSAGE, ({ user, message }: SocketMessage) => {
+      const msg = { from: user, message };
+      setMessages((prev) => [...prev, msg]);
     });
 
-    socket?.on(Actions.USER_CONNECTED, (data: SocketMessage) => {
-      setMessages((prev) => [...prev, data]);
+    socket?.on(Actions.USER_CONNECTED, ({ message }: SocketMessage) => {
+      const msg = { message };
+      setMessages((prev) => [...prev, msg]);
     });
 
-    socket?.on(Actions.USER_DISCONNECTED, (data: SocketMessage) => {
-      setMessages((prev) => [...prev, data]);
+    socket?.on(Actions.USER_DISCONNECTED, ({ message }: SocketMessage) => {
+      const msg = { message };
+      setMessages((prev) => [...prev, msg]);
     });
   }, [socket]);
 
